@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class DestroyByBoundery : MonoBehaviour
+public class DestroyByBoundary : MonoBehaviour
 {
     private void OnTriggerExit(Collider other)
     {
