@@ -23,7 +23,7 @@ public class DestroyByContact : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Boundary")
+        if (other.CompareTag("Boundary") || other.CompareTag("Enemy"))
         {
             return;
         }
@@ -33,7 +33,7 @@ public class DestroyByContact : MonoBehaviour
             Instantiate(Explosion, transform.position, transform.rotation);
         }
 
-        if (other.tag == "Player")
+        if (other.CompareTag("Player"))
         {
             Instantiate(PlayerExplosion, other.transform.position, other.transform.rotation);
             _gameController.GameOver();
