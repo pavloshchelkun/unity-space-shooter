@@ -16,7 +16,8 @@ public class PlayerController : MonoBehaviour
     public Transform ShotSpawn;
     public float FireRate;
 
-    private float nextFire;
+    private float _nextFire;
+    private Quaternion _calibrationQuaternion;
 
     private Rigidbody _rigidbody;
     private AudioSource _audioSource;
@@ -25,25 +26,44 @@ public class PlayerController : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody>();
         _audioSource = GetComponent<AudioSource>();
+
+        CalibrateAccelerometer();
     }
 
-    void Update()
+    private void Update()
     {
-        if (Input.GetButton("Fire1") && Time.time > nextFire)
+        if (Input.GetButton("Fire1") && Time.time > _nextFire)
         {
-            nextFire = Time.time + FireRate;
+            _nextFire = Time.time + FireRate;
             Instantiate(Shot, ShotSpawn.position, ShotSpawn.rotation);
             _audioSource.Play();
         }
     }
 
+    private void CalibrateAccelerometer()
+    {
+        Vector3 accelerationSnapshot = Input.acceleration;
+        Quaternion rotateQuaternion = Quaternion.FromToRotation(new Vector3(0f, 0f, -1f), accelerationSnapshot);
+        _calibrationQuaternion = Quaternion.Inverse(rotateQuaternion);
+    }
+
+    private Vector3 FixAcceleration(Vector3 acceleration)
+    {
+        Vector3 fixedAcceleration = _calibrationQuaternion * acceleration;
+        return fixedAcceleration;
+    }
 
     private void FixedUpdate()
     {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+        //float moveHorizontal = Input.GetAxis("Horizontal");
+        //float moveVertical = Input.GetAxis("Vertical");
 
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        //Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        //_rigidbody.velocity = movement * Speed;
+        
+        Vector3 accelerationRaw = Input.acceleration;
+        Vector3 acceleration = FixAcceleration(accelerationRaw);
+        Vector3 movement = new Vector3(acceleration.x, 0.0f, acceleration.y);
         _rigidbody.velocity = movement * Speed;
 
         _rigidbody.position = new Vector3
