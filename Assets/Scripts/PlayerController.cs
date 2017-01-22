@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour
     public GameObject Shot;
     public Transform ShotSpawn;
     public float FireRate;
+    public SimpleTouchPad TouchPad;
+    public SimpleTouchAreaButton AreaButton;
 
     private float _nextFire;
     private Quaternion _calibrationQuaternion;
@@ -32,7 +34,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButton("Fire1") && Time.time > _nextFire)
+        if (AreaButton.CanFire() && Time.time > _nextFire)
         {
             _nextFire = Time.time + FireRate;
             Instantiate(Shot, ShotSpawn.position, ShotSpawn.rotation);
@@ -61,9 +63,11 @@ public class PlayerController : MonoBehaviour
         //Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
         //_rigidbody.velocity = movement * Speed;
         
-        Vector3 accelerationRaw = Input.acceleration;
-        Vector3 acceleration = FixAcceleration(accelerationRaw);
-        Vector3 movement = new Vector3(acceleration.x, 0.0f, acceleration.y);
+        //Vector3 accelerationRaw = Input.acceleration;
+        //Vector3 acceleration = FixAcceleration(accelerationRaw);
+
+        Vector2 direction = TouchPad.GetDirection();
+        Vector3 movement = new Vector3(direction.x, 0.0f, direction.y);
         _rigidbody.velocity = movement * Speed;
 
         _rigidbody.position = new Vector3
